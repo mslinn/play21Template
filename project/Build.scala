@@ -13,6 +13,16 @@ object ApplicationBuild extends Build {
     )
 
     val main = play.Project(appName, appVersion, appDependencies).settings(
-      scalaVersion := "2.10.3"
+      scalaVersion := "2.10.3",
+      scalacOptions ++= Seq("-deprecation", "-encoding", "UTF-8", "-feature", "-target:jvm-1.6", "-unchecked",
+        "-Ywarn-adapted-args", "-Ywarn-value-discard", "-Xlint"),
+      javaOptions in Test ++= Seq( "-Dconfig.file=conf/dev.conf" ),
+      logBuffered in Test := false,
+      Keys.fork in Test := false,
+      parallelExecution in Test := false,
+      initialCommands := """// make app resources accessible
+                           |Thread.currentThread.setContextClassLoader(getClass.getClassLoader)
+                           |new play.core.StaticApplication(new java.io.File("."))
+                           |""".stripMargin
     )
 }
